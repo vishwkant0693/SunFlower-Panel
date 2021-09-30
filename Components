@@ -1,13 +1,16 @@
-An Arduino (Uno used here) 
+Dual Axis Tracking Stand
 
-Single Axis Tracking Stand 
+Arduino UNO R3 
 
-2 x 10K Resistors 
+2 x Servo Motor
 
-2 x LDRs 
+4 x 10K Resistors 
 
-1  x Mini Solar Panel 
+4 x LDRs 
+
+1 x Mini Solar Panel 
 
 Connection Wires
 
-Servo Motor
+5V Battery
+
