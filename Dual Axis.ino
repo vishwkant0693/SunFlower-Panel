@@ -1,88 +1,84 @@
 #include <Servo.h>
-//defining Servos
-Servo servohori;
-int servoh = 0;
-int servohLimitHigh = 160;
-int servohLimitLow = 20;
+Servo horizontal; // horizontal servo
+int servoh = 180;
+int servohLimitHigh = 175;
+int servohLimitLow = 5;
+// 65 degrees MAX
 
-Servo servoverti; 
-int servov = 0; 
-int servovLimitHigh = 160;
-int servovLimitLow = 20;
-//Assigning LDRs
-int ldrtopl = 2; //top left LDR green
-int ldrtopr = 1; //top right LDR yellow
-int ldrbotl = 3; // bottom left LDR blue
-int ldrbotr = 0; // bottom right LDR orange
+Servo vertical; // vertical servo
+int servov = 45;
+int servovLimitHigh = 100;
+int servovLimitLow = 1;
 
- void setup () 
- {
-  servohori.attach(10);
-  servohori.write(0);
-  servoverti.attach(9);
-  servoverti.write(0);
-  delay(500);
- }
 
-void loop()
+ 
+// LDR pin connections
+// name = analogpin;
+int ldrlt = A0; //LDR top left – BOTTOM LEFT <— BDG
+int ldrrt = A3; //LDR top rigt – BOTTOM RIGHT
+int ldrld = A1; //LDR down left – TOP LEFT
+int ldrrd = A2; //ldr down rigt – TOP RIGHT
+
+void setup(){
+horizontal.attach(9);
+vertical.attach(10);
+horizontal.write(180);
+vertical.write(45);
+delay(2500);
+}
+void loop() {
+int lt = analogRead(ldrlt); // top left
+int rt = analogRead(ldrrt); // top right
+int ld = analogRead(ldrld); // down left
+int rd = analogRead(ldrrd); // down right
+int dtime = 10; int tol = 90; // dtime=diffirence time, tol=toleransi
+int avt = (lt + rt) / 2; // average value top
+int avd = (ld + rd) / 2; // average value down
+int avl = (lt + ld) / 2; // average value left
+int avr = (rt + rd) / 2; // average value right
+int dvert = avt - avd; // check the diffirence of up and down
+int dhoriz = avl - avr;// check the diffirence og left and right
+
+if (-1*tol > dvert || dvert > tol)
 {
-  servoh = servohori.read();
-  servov = servoverti.read();
-  //capturing analog values of each LDR
-  int topl = analogRead(ldrtopl);
-  int topr = analogRead(ldrtopr);
-  int botl = analogRead(ldrbotl);
-  int botr = analogRead(ldrbotr);
-  // calculating average
-  int avgtop = (topl + topr) / 2; //average of top LDRs
-  int avgbot = (botl + botr) / 2; //average of bottom LDRs
-  int avgleft = (topl + botl) / 2; //average of left LDRs
-  int avgright = (topr + botr) / 2; //average of right LDRs
+if (avt > avd)
+{
+servov = ++servov;
+if (servov > servovLimitHigh)
+{servov = servovLimitHigh;}
+}
+else if (avt < avd)
+{servov= --servov;
+if (servov < servovLimitLow)
+{ servov = servovLimitLow;}
+}
+vertical.write(servov);
+}
+if (-1*tol > dhoriz || dhoriz > tol) // check if the diffirence is in the tolerance else change horizontal angle
+{
+if (avl > avr)
+{
+servoh = --servoh;
+if (servoh < servohLimitLow)
+{
+servoh = servohLimitLow;
+}
+}
+else if (avl < avr)
+{
+servoh = ++servoh;
+if (servoh > servohLimitHigh)
+{
+servoh = servohLimitHigh;
+}
+}
+else if (avl = avr)
+{
+delay(5000);
+}
+horizontal.write(servoh);
+}
 
-  if (avgtop < avgbot)
-  {
-    servoverti.write(servov +1);
-    if (servov > servovLimitHigh) 
-     { 
-      servov = servovLimitHigh;
-     }
-    delay(10);
-  }
-  else if (avgbot < avgtop)
-  {
-    servoverti.write(servov -1);
-    if (servov < servovLimitLow)
-  {
-    servov = servovLimitLow;
-  }
-    delay(10);
-  }
-  else 
-  {
-    servoverti.write(servov);
-  }
-  
-  if (avgleft > avgright)
-  {
-    servohori.write(servoh +1);
-    if (servoh > servohLimitHigh)
-    {
-    servoh = servohLimitHigh;
-    }
-    delay(10);
-  }
-  else if (avgright > avgleft)
-  {
-    servohori.write(servoh -1);
-    if (servoh < servohLimitLow)
-     {
-     servoh = servohLimitLow;
-     }
-    delay(10);
-  }
-  else 
-  {
-    servohori.write(servoh);
-  }
-  delay(50);
+delay(dtime);
+
 }
